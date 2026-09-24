@@ -1,5 +1,9 @@
 # Antigravity Editor Integration for Unity
 
+## [1.0.2] - 2026-09-24
+
+- Add agent rules for automatic semantic patch versioning and git tagging on releases.
+
 ## [1.0.1] - 2026-09-24
 
 Integration:
