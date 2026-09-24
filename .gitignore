@@ -1,0 +1,21 @@
+# OS metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Visual Studio / Rider / IDE cache & project files
+.vs/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.unityproj
+
+# Build / Output
+[Bb]in/
+[Oo]bj/
