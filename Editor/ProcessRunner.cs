@@ -1,4 +1,4 @@
-﻿/*---------------------------------------------------------------------------------------------
+/*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
@@ -118,27 +118,28 @@ namespace ToppStudio.Antigravity.Editor
 
 		public static string[] GetProcessWorkspaces(Process process)
 		{
-			if (process == null)
-				return null;
-
 			try
 			{
 				var workspaces = new List<string>();
 				var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-				string antigravityStoragePath;
+				var searchPaths = new List<string>();
 
 #if UNITY_EDITOR_OSX
-				antigravityStoragePath = Path.Combine(userProfile, "Library", "Application Support", "Antigravity", "User", "workspaceStorage");
+				searchPaths.Add(Path.Combine(userProfile, "Library", "Application Support", "Antigravity", "User", "workspaceStorage"));
+				searchPaths.Add(Path.Combine(userProfile, "Library", "Application Support", "Antigravity IDE", "User", "workspaceStorage"));
 #elif UNITY_EDITOR_LINUX
-				antigravityStoragePath = Path.Combine(userProfile, ".config", "Antigravity", "User", "workspaceStorage");
+				searchPaths.Add(Path.Combine(userProfile, ".config", "Antigravity", "User", "workspaceStorage"));
+				searchPaths.Add(Path.Combine(userProfile, ".config", "Antigravity IDE", "User", "workspaceStorage"));
 #else
-				antigravityStoragePath = Path.Combine(userProfile, "AppData", "Roaming", "Antigravity", "User", "workspaceStorage");
+				searchPaths.Add(Path.Combine(userProfile, "AppData", "Roaming", "Antigravity", "User", "workspaceStorage"));
+				searchPaths.Add(Path.Combine(userProfile, "AppData", "Roaming", "Antigravity IDE", "User", "workspaceStorage"));
 #endif
 
-				Debug.Log($"[Antigravity] Looking for workspaces in: {antigravityStoragePath}");
-
-				if (Directory.Exists(antigravityStoragePath))
+				foreach (var antigravityStoragePath in searchPaths)
 				{
+					if (!Directory.Exists(antigravityStoragePath))
+						continue;
+
 					foreach (var workspaceDir in Directory.GetDirectories(antigravityStoragePath))
 					{
 						try
@@ -189,23 +190,17 @@ namespace ToppStudio.Antigravity.Editor
 								}
 							}
 						}
-						catch (Exception ex)
+						catch
 						{
-							Debug.LogWarning($"[Antigravity] Error reading workspace state file: {ex.Message}");
-							continue;
+							// Ignore unreadable individual workspace files
 						}
 					}
-				}
-				else
-				{
-					Debug.LogWarning($"[Antigravity] Workspace storage directory not found: {antigravityStoragePath}");
 				}
 
 				return workspaces.Distinct().ToArray();
 			}
-			catch (Exception ex)
+			catch
 			{
-				Debug.LogError($"[Antigravity] Error getting workspace directory: {ex.Message}");
 				return null;
 			}
 		}
