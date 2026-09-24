@@ -1,6 +1,19 @@
-# Code Editor Package for Visual Studio
+# Antigravity Editor Integration for Unity
 
-## [2.0.22] - 2023-10-03
+## [1.0.1] - 2026-09-24
+
+Integration:
+
+- Add auto-discovery and display naming for Antigravity IDE executable paths.
+- Add support for both Antigravity and Antigravity IDE workspaceStorage profiles.
+- Silence verbose debug logging during process and workspace scanning.
+- Rename assembly and namespaces to ToppStudio.Antigravity.Editor to prevent package conflicts.
+
+## [1.0.0] - 2026-09-24
+
+Integration:
+
+- Initial release of Antigravity Editor integration.
 
 Integration:
 
