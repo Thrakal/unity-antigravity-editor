@@ -1,4 +1,4 @@
-﻿/*---------------------------------------------------------------------------------------------
+/*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
@@ -114,9 +114,12 @@ namespace ToppStudio.Antigravity.Editor {
 			}
 
 			isPrerelease = isPrerelease || editorPath.ToLower().Contains("insider");
+			var isIde = editorPath.IndexOf("IDE", StringComparison.OrdinalIgnoreCase) >= 0;
+			var baseName = isIde ? "Antigravity IDE" : "Antigravity";
+
 			installation = new VisualStudioAntigravityInstallation() {
 				IsPrerelease = isPrerelease,
-				Name = "Antigravity" + (isPrerelease ? " - Insider" : string.Empty) + (version != null ? $" [{version.ToString(3)}]" : string.Empty),
+				Name = baseName + (isPrerelease ? " - Insider" : string.Empty) + (version != null ? $" [{version.ToString(3)}]" : string.Empty),
 				Path = editorPath,
 				Version = version ?? new Version()
 			};
@@ -130,8 +133,12 @@ namespace ToppStudio.Antigravity.Editor {
 #if UNITY_EDITOR_WIN
 			var localAppPath = IOPath.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs");
 			var programFiles = IOPath.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
+			var programFilesX86 = IOPath.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86));
 
-			foreach (var basePath in new[] { localAppPath, programFiles }) {
+			foreach (var basePath in new[] { localAppPath, programFiles, programFilesX86 }) {
+				candidates.Add(IOPath.Combine(basePath, "Antigravity IDE", "Antigravity IDE.exe"));
+				candidates.Add(IOPath.Combine(basePath, "Antigravity IDE", "Antigravity.exe"));
+				candidates.Add(IOPath.Combine(basePath, "Antigravity", "Antigravity IDE.exe"));
 				candidates.Add(IOPath.Combine(basePath, "Antigravity", "Antigravity.exe"));
 			}
 #elif UNITY_EDITOR_OSX
@@ -140,8 +147,11 @@ namespace ToppStudio.Antigravity.Editor {
 #elif UNITY_EDITOR_LINUX
 			// Well known locations
 			candidates.Add("/usr/bin/antigravity");
+			candidates.Add("/usr/bin/antigravity-ide");
 			candidates.Add("/bin/antigravity");
+			candidates.Add("/bin/antigravity-ide");
 			candidates.Add("/usr/local/bin/antigravity");
+			candidates.Add("/usr/local/bin/antigravity-ide");
 
 			// Preference ordered base directories relative to which desktop files should be searched
 			candidates.AddRange(GetXdgCandidates());
@@ -466,12 +476,17 @@ namespace ToppStudio.Antigravity.Editor {
 			// Get process name list based on different operating systems
 #if UNITY_EDITOR_OSX
 			processes.AddRange(Process.GetProcessesByName("Antigravity"));
+			processes.AddRange(Process.GetProcessesByName("Antigravity IDE"));
 			processes.AddRange(Process.GetProcessesByName("Antigravity Helper"));
 #elif UNITY_EDITOR_LINUX
 			processes.AddRange(Process.GetProcessesByName("antigravity"));
+			processes.AddRange(Process.GetProcessesByName("antigravity-ide"));
 			processes.AddRange(Process.GetProcessesByName("Antigravity"));
+			processes.AddRange(Process.GetProcessesByName("Antigravity IDE"));
 #else
 			processes.AddRange(Process.GetProcessesByName("antigravity"));
+			processes.AddRange(Process.GetProcessesByName("Antigravity"));
+			processes.AddRange(Process.GetProcessesByName("Antigravity IDE"));
 #endif
 			
 			foreach (var process in processes) {
